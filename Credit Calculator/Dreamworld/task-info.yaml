@@ -94,6 +94,13 @@ files:
     if __name__ == '__main__':
         CreditCalcTest('creditcalc.creditcalc').run_tests()
   learner_created: false
+- name: creditcalc/creditcalc.py
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/90/stages/501/implement
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations! Continue on <a href="https://hyperskill.org/projects/90/stages/501/implement">JetBrains
+    Academy</a>
+  time: Wed, 01 Jul 2020 16:25:18 UTC
 record: -1
