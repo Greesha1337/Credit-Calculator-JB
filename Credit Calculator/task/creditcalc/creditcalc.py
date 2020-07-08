@@ -25,7 +25,7 @@ def main():
                 if itm < 0:
                     print('Incorrect parameters')
 
-        if args.interest is None or args.interest < 0:
+        if args.interest is None:
             print('Incorrect parameters')
             exit(0)
         else:
