@@ -18,20 +18,18 @@ def main():
         for itm in sys.argv:
             for i, el in enumerate(itm):
                 if el == '=':
-                    itm = itm[i+1:]
+                    itm = itm[i + 1:]
                     break
             if itm.isdigit():
                 itm = int(itm)
                 if itm < 0:
                     print('Incorrect parameters')
 
-
         if args.interest is None or args.interest < 0:
             print('Incorrect parameters')
             exit(0)
         else:
             i = args.interest / (12 * 100)
-
 
         if args.type not in ['annuity', 'diff']:
             print('Incorrect parameters')
