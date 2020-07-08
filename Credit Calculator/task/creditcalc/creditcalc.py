@@ -1,81 +1,107 @@
 import math
+import argparse
+import sys
 
-while True:
-    payment_choise = input('''What do you want to calculate?
-type \"n\" - for count of months,
-type \"a\" - for annuity monthly payment,
-type \"p\" - for monthly payment:\n''')
-    if payment_choise == 'n':
-        credit_principal = float(input('Enter the credit principal:\n'))
-        monthly_payment = float(input('Enter monthly payment:\n'))
-        credit_interest = float(input('Enter credit interest:\n'))
-        nominal_interest = credit_interest / (12 * 100)
-        count_of_periods = math.log(monthly_payment / (monthly_payment - nominal_interest * credit_principal), 1 +
-                                    nominal_interest)
-        years = round(count_of_periods // 12)
-        months = math.ceil(count_of_periods % 12)
-        if months == 12:
-            years += 1
-            months -= 12
-        if years == 0 and months == 1:
-            print(f'You need {months} month to repay this credit!')
-            break
-        elif years == 0 and 1 < months < 12:
-            print(f'You need {months} months to repay this credit!')
-            break
-        elif years == 1 and months == 0:
-            print(f'You need {years} year to repay this credit!')
-            break
-        elif years > 1 and months == 0:
-            print(f'You need {years} years to repay this credit!')
-            break
-        elif years == 1 and months == 1:
-            print(f'You need {years} year and {months} month to repay this credit!')
-            break
-        elif years == 1 and 1 < months < 12:
-            print(f'You need {years} year and {months} months to repay this credit!')
-            break
-        elif years > 1 and months == 1:
-            print(f'You need {years} years and {months} month to repay this credit!')
-            break
-        elif years > 1 and 1 < months < 12:
-            print(f'You need {years} years and {months} months to repay this credit!')
-            break
+
+def main():
+    if __name__ == '__main__':
+        parser = argparse.ArgumentParser(description='Credit calculator')
+
+        parser.add_argument('-t', '--type', help='Type of payment (Annuity or Differential)')
+        parser.add_argument('-y', '--payment', help='Monthly payment', type=int)
+        parser.add_argument('-p', '--principal', help='Credit principal', type=int)
+        parser.add_argument('-r', '--periods', help='Count of months', type=int)
+        parser.add_argument('-n', '--interest', help='Credit interest', type=float)
+
+        args = parser.parse_args()
+
+        for itm in sys.argv:
+            for i, el in enumerate(itm):
+                if el == '=':
+                    itm = itm[i+1:]
+                    break
+            if itm.isdigit():
+                itm = int(itm)
+                if itm < 0:
+                    print('Incorrect parameters')
+
+
+        if args.interest is None or args.interest < 0:
+            print('Incorrect parameters')
+            exit(0)
         else:
-            # if credit_principal % monthly_payment == 0:
-            #     print(f'It takes {months} months to repay the credit')
-            #     break
-            # else:
-            #     print(f'It takes {months + 1} months to repay the credit')
-            break
-    # elif payment_choise == 'p':
-    #     count_of_months = int(input('Enter count of months:\n'))
-    #     monthly_payment = credit_principal // count_of_months + 1
-    #     last_payment = credit_principal - (count_of_months - 1) * monthly_payment
-    #     if credit_principal % count_of_months == 0:
-    #         print(f'Your monthly payment = {credit_principal // count_of_months}')
-    #         break
-    #     else:
-    #         print(f'Your monthly payment = {monthly_payment} with last month payment = {last_payment}')
-    #         break
-    elif payment_choise == 'a':
-        credit_principal = float(input('Enter the credit principal:\n'))
-        count_of_periods = float(input('Enter count of periods:\n'))
-        credit_interest = float(input('Enter credit interest:\n'))
-        nominal_interest = credit_interest / (12 * 100)
-        annuity_payment = math.ceil(credit_principal * ((nominal_interest *
-                                                         pow(1 + nominal_interest, count_of_periods))) /
-                                    (pow(1 + nominal_interest, count_of_periods) - 1))
-        print(f'Your annuity payment = {annuity_payment}!')
-        break
-    elif payment_choise == 'p':
-        monthly_payment = float(input('Enter monthly payment:\n'))
-        count_of_periods = float(input('Enter count of periods:\n'))
-        credit_interest = float(input('Enter credit interest:\n'))
-        nominal_interest = credit_interest / (12 * 100)
-        credit_principal = round(monthly_payment / ((nominal_interest * pow(1 + nominal_interest, count_of_periods)) /
-                                                    (pow(1 + nominal_interest, count_of_periods) - 1)))
-        print(f'Your credit principal = {credit_principal}!')
-        break
+            i = args.interest / (12 * 100)
+
+
+        if args.type not in ['annuity', 'diff']:
+            print('Incorrect parameters')
+            exit(0)
+
+        else:
+            if args.type == 'annuity':
+                if args.payment is None:
+                    def calc_annuity(principal, periods, interest):
+                        args.principal = principal
+                        args.periods = periods
+                        args.interest = interest
+                        annuity = principal * ((i * (i + 1) ** periods) / (((1 + i) ** periods) - 1))
+                        print(f'Your annuity payment = {math.ceil(annuity)}')
+                        print(f'Overpayment = {math.ceil(annuity) * periods - principal}')
+
+                    calc_annuity(args.principal, args.periods, args.interest)
+
+                elif args.periods is None:
+                    def calc_period(principal, payment, interest):
+                        args.principal = principal
+                        args.payment = payment
+                        args.interest = interest
+                        period = math.ceil(math.log((payment / (payment - i * principal)), 1 + i))
+                        if period % 12 != 0:
+                            print(
+                                f'You need {int(period // 12)} years and'
+                                f'{int(period % 12)} months to repay this credit!')
+                        elif period == 12:
+                            print(f'You need {int(period // 12)} year to repay this credit!')
+                        else:
+                            print(f'You need {int(period // 12)} years to repay this credit!')
+
+                        print(f'Overpayment = {math.ceil(period) * payment - principal}')
+
+                    calc_period(args.principal, args.payment, args.interest)
+
+                elif args.principal is None:
+                    def calc_principal(payment, interest, periods):
+                        args.periods = periods
+                        args.payment = payment
+                        args.interest = interest
+                        principal = payment / ((i * ((i + 1) ** periods)) / (((i + 1) ** periods) - 1))
+                        print(f'Your credit principal = {int(principal)}')
+                        print(f'Overpayment = {math.ceil(payment * periods - principal)}')
+
+                    calc_principal(args.payment, args.interest, args.periods)
+
+                else:
+                    print('Incorrect parameters')
+
+            else:
+                def calc_diff(principal, interest, periods):
+                    args.principal = principal
+                    args.periods = periods
+                    args.interest = interest
+                    month = 1
+                    monthly_payment = []
+                    while month <= periods:
+                        payment = principal / periods + i * (principal - (principal * (month - 1) / periods))
+                        print(f'Month {month}: paid out {math.ceil(payment)}')
+                        month += 1
+                        monthly_payment.append(math.ceil(payment))
+                    print()
+                    print(f'Overpayment = {math.ceil(sum(monthly_payment) - principal)}')
+
+                calc_diff(args.principal, args.interest, args.periods)
+
     else:
-        break
+        exit(0)
+
+
+main()
